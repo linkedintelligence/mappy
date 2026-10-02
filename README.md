@@ -1,3 +1,4 @@
+## Mappy - The AI for the Everyday Move
 
 Mappy lets you search for places the way you naturally think.
 
