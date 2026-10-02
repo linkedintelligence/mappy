@@ -142,8 +142,6 @@ Place availability and metadata depend on the coverage and quality of OpenStreet
 
 Mappy does not invent ratings, amenities, opening hours, or other place information when those details are unavailable.
 
-Overpass may become buggy, that's expected.
-
 ## 🤖 AI
 
 Mappy can use a locally running Qwen3 0.6B model to interpret natural-language searches.
