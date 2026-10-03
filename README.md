@@ -1,5 +1,7 @@
 ## Mappy - The AI for the Everyday Move
 
+<img width="2560" height="1440" alt="Innovate for the modern age(1)" src="https://github.com/user-attachments/assets/7c2505d5-916c-4e4d-ba75-a60800c59e09" />
+
 Mappy lets you search for places the way you naturally think.
 
 Instead of filtering through dozens of categories and checkboxes, you can simply ask:
@@ -146,6 +148,8 @@ Mappy does not invent ratings, amenities, opening hours, or other place informat
 
 ## 🤖 AI
 
+<img width="2560" height="1440" alt="Innovate for the modern age(2)" src="https://github.com/user-attachments/assets/3e232c1e-7781-41fb-941d-09001c442b38" />
+
 Mappy can use a locally running Qwen3 0.6B model to interpret natural-language searches.
 
 For example:
@@ -185,6 +189,8 @@ However, public OpenStreetMap-related services are shared infrastructure and may
 Production deployments should use appropriate infrastructure and follow the policies of the services they depend on.
 
 ## 📦 MapLink - The API for Mappy
+
+<img width="2560" height="1440" alt="Innovate for the modern age(3)" src="https://github.com/user-attachments/assets/2fece36e-3f3c-4eaf-a711-6d26d1ce8c23" />
 
 Mappy can also be used as an API for applications that want natural-language place discovery.
 
