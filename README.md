@@ -141,6 +141,9 @@ http://localhost:3000
 
 ## 🌍 Data
 
+<img width="2560" height="1440" alt="Innovate for the modern age(2)" src="https://github.com/user-attachments/assets/b5750b32-c83c-42f3-b164-79f5c392ce7a" />
+
+
 Mappy uses OpenStreetMap data through Overpass.
 
 Place availability and metadata depend on the coverage and quality of OpenStreetMap data in a particular area.
@@ -149,7 +152,7 @@ Mappy does not invent ratings, amenities, opening hours, or other place informat
 
 ## 🤖 AI
 
-<img width="2560" height="1440" alt="Innovate for the modern age(2)" src="https://github.com/user-attachments/assets/3e232c1e-7781-41fb-941d-09001c442b38" />
+<img width="2560" height="1440" alt="Innovate for the modern age(4)" src="https://github.com/user-attachments/assets/07fcda5c-00fb-4c04-8ec7-842ddd8cbfb0" />
 
 
 Mappy can use a locally running Qwen3 0.6B model to interpret natural-language searches.
