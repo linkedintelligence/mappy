@@ -1,156 +1,283 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mappy - The efficient, fast geographer.</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#f5f7fb;color:#172033}header{padding:20px 24px;background:#fff;border-bottom:1px solid #e7eaf0;display:flex;justify-content:space-between}.logo{font-size:25px;font-weight:800}.badge{font-size:12px;padding:6px 9px;border-radius:99px;background:#eef2ff;color:#4655c7}main{display:grid;grid-template-columns:420px 1fr;height:calc(100vh - 70px)}aside{background:#fff;border-right:1px solid #e7eaf0;padding:18px;overflow:auto}#map{height:100%}textarea,input,select,button{font:inherit}textarea{width:100%;min-height:88px;border:1px solid #d9deea;border-radius:14px;padding:12px;resize:vertical}select,input{width:100%;padding:10px;border:1px solid #d9deea;border-radius:11px;background:#fff}button{width:100%;border:0;border-radius:12px;padding:12px;background:#172033;color:#fff;font-weight:700;cursor:pointer;margin-top:10px}.card{border:1px solid #e4e7ee;border-radius:15px;padding:13px;margin-top:10px}.card h3{margin:0 0 5px;font-size:16px}.meta,.status{font-size:12px;color:#687386}.reason{font-size:12px;margin-top:7px;color:#33415c}.score{float:right;font-weight:800}.intent{margin:12px 0;padding:11px;border-radius:13px;background:#f5f7ff;font-size:12px;color:#4c5872}.chip{display:inline-block;background:#edf1f7;border-radius:99px;padding:4px 7px;margin:3px 3px 0 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}a{color:#4c5bd5;text-decoration:none}@media(max-width:850px){main{grid-template-columns:1fr;height:auto}#map{height:55vh}aside{border:0;border-bottom:1px solid #e7eaf0}}</style></head>
-<body><header><div class="logo">mappy. <span class="badge">v0.4</span></div><div class="meta">The efficient, fast geographer.</div></header><main><aside>
-<label class="meta">Where?</label><select id="location"><option value="my">My location</option><option value="nyc">New York City</option><option value="london">London</option><option value="custom">Custom coordinates</option></select>
-<div id="custom" class="row" style="display:none;margin-top:8px"><input id="lat" placeholder="Latitude"><input id="lon" placeholder="Longitude"></div>
-<label class="meta" style="display:block;margin-top:12px">What are you looking for?</label><textarea id="query" placeholder="quiet café with Wi-Fi where I can study for 3 hours"></textarea><button id="go">Find places</button>
-<div id="status" class="status" style="margin-top:10px"></div><div id="intent"></div><div id="results"></div></aside><div id="map"></div></main>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
-const map = L.map("map").setView([40.7128,-74.006],13);
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mappy - AI for the Everyday Move</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fb;color:#172033}
+header{padding:18px 24px;background:#fff;border-bottom:1px solid #e7eaf0;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:800}.badge{font-size:12px;padding:6px 9px;border-radius:99px;background:#eef2ff;color:#4655c7}
+main{display:grid;grid-template-columns:440px 1fr;height:calc(100vh - 67px)}
+aside{background:#fff;border-right:1px solid #e7eaf0;padding:18px;overflow:auto}
+#map{height:100%}
+textarea,input,select,button{font:inherit}
+textarea{width:100%;min-height:88px;border:1px solid #d9deea;border-radius:14px;padding:12px;resize:vertical}
+select,input{width:100%;padding:10px;border:1px solid #d9deea;border-radius:11px;background:#fff}
+button{border:0;border-radius:12px;padding:11px 13px;background:#172033;color:#fff;font-weight:700;cursor:pointer;margin-top:10px}
+button:disabled{opacity:.55;cursor:wait}
+button.secondary{background:#eef1f7;color:#172033}
+button.small{padding:7px 9px;font-size:12px;margin:0}
+.card{border:1px solid #e4e7ee;border-radius:15px;padding:13px;margin-top:10px;background:#fff}
+.card h3{margin:0 0 5px;font-size:16px}.meta,.status{font-size:12px;color:#687386}
+.reason{font-size:12px;margin-top:7px;color:#33415c}.score{float:right;font-weight:800}
+.intent{margin:12px 0;padding:11px;border-radius:13px;background:#f5f7ff;font-size:12px;color:#4c5872}
+.chip{display:inline-block;background:#edf1f7;border-radius:99px;padding:4px 7px;margin:3px 3px 0 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.actions button{margin:0}
+.saved-box{margin-top:18px;padding-top:15px;border-top:1px solid #e7eaf0}
+.saved-head{display:flex;justify-content:space-between;align-items:center}
+.saved-head h3{margin:0;font-size:15px}
+.saved-item{display:flex;gap:8px;align-items:center;border:1px solid #e5e8ef;border-radius:12px;padding:9px;margin-top:8px}
+.saved-item-main{min-width:0;flex:1}.saved-item-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-item-meta{font-size:11px;color:#748096;margin-top:2px}
+.icon-btn{background:#eef1f7;color:#172033;margin:0;padding:7px 9px;width:auto}
+.empty{font-size:12px;color:#7b8494;padding:10px 0}
+.itinerary-panel{margin-top:12px;padding:13px;border-radius:14px;background:#f7f8fc;border:1px solid #e3e7ef}
+.itinerary-panel h3{margin:0 0 8px;font-size:15px}
+.itinerary-row{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #e5e8ef}
+.itinerary-row:last-child{border-bottom:0}
+.itinerary-row input{width:auto}
+.stop-num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#172033;color:#fff;font-size:11px;font-weight:800;flex:none}
+.stop-name{font-size:13px;font-weight:700}.stop-meta{font-size:11px;color:#748096}
+.timeline{margin-top:12px}
+.timeline-stop{position:relative;padding:0 0 14px 34px}
+.timeline-stop:before{content:"";position:absolute;left:9px;top:5px;width:10px;height:10px;border-radius:50%;background:#172033}
+.timeline-stop:after{content:"";position:absolute;left:13px;top:15px;width:2px;height:calc(100% - 10px);background:#d8dde7}
+.timeline-stop:last-child:after{display:none}
+.timeline-title{font-weight:800;font-size:13px}.timeline-meta{font-size:11px;color:#687386;margin-top:2px}
+a{color:#4c5bd5;text-decoration:none}
+@media(max-width:850px){main{grid-template-columns:1fr;height:auto}#map{height:55vh}aside{border:0;border-bottom:1px solid #e7eaf0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">mappy. <span class="badge">v0.5</span></div>
+  <div class="meta">AI for the Everyday Move</div>
+</header>
+<main>
+<aside>
+  <label class="meta">Where?</label>
+  <select id="location">
+    <option value="my">My location</option>
+    <option value="nyc">New York City</option>
+    <option value="london">London</option>
+    <option value="custom">Custom coordinates</option>
+  </select>
+  <div id="custom" class="row" style="display:none;margin-top:8px">
+    <input id="lat" placeholder="Latitude"><input id="lon" placeholder="Longitude">
+  </div>
+
+  <label class="meta" style="display:block;margin-top:12px">What are you looking for?</label>
+  <textarea id="query" placeholder="quiet café with Wi-Fi where I can study for 3 hours"></textarea>
+  <button id="go">Find places</button>
+
+  <div class="actions">
+    <button id="savedToggle" class="secondary">♡ Saved <span id="savedCount">0</span></button>
+    <button id="itineraryToggle" class="secondary">Itinerary</button>
+  </div>
+
+  <div id="status" class="status" style="margin-top:10px"></div>
+  <div id="intent"></div>
+  <div id="results"></div>
+
+  <section id="savedSection" class="saved-box" style="display:none">
+    <div class="saved-head"><h3>Saved places</h3><button id="clearSaved" class="small secondary">Clear all</button></div>
+    <div id="savedList"></div>
+  </section>
+
+  <section id="itinerarySection" class="itinerary-panel" style="display:none">
+    <h3>Build an itinerary</h3>
+    <div id="itineraryPicker"></div>
+    <button id="generateItinerary">Generate itinerary</button>
+    <div id="itineraryResult"></div>
+  </section>
+</aside>
+<div id="map"></div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map("map").setView([40.7128,-74.006],13);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap contributors"}).addTo(map);
 
-const $ = id => document.getElementById(id);
-const locationSelect = $("location");
-const customBox = $("custom");
-const latInput = $("lat");
-const lonInput = $("lon");
-const queryInput = $("query");
-const goButton = $("go");
-const statusEl = $("status");
-const intentEl = $("intent");
-const resultsEl = $("results");
+const $=id=>document.getElementById(id);
+const locationSelect=$("location"), customBox=$("custom"), latInput=$("lat"), lonInput=$("lon");
+const queryInput=$("query"), goButton=$("go"), statusEl=$("status"), intentEl=$("intent"), resultsEl=$("results");
+const savedToggle=$("savedToggle"), savedCount=$("savedCount"), savedSection=$("savedSection"), savedList=$("savedList");
+const clearSaved=$("clearSaved"), itineraryToggle=$("itineraryToggle"), itinerarySection=$("itinerarySection");
+const itineraryPicker=$("itineraryPicker"), generateItinerary=$("generateItinerary"), itineraryResult=$("itineraryResult");
 let markers=[];
-
+let lastSearchLocation=null;
 const presets={nyc:[40.7128,-74.006],london:[51.5074,-0.1278]};
 
-locationSelect.addEventListener("change",()=>{
-  customBox.style.display = locationSelect.value==="custom" ? "grid" : "none";
-});
-
-function getSearchLocation(){
-  const choice=locationSelect.value;
-  if(presets[choice]) return Promise.resolve(presets[choice]);
-
-  if(choice==="custom"){
-    const lat=Number(latInput.value), lon=Number(lonInput.value);
-    if(Number.isFinite(lat)&&Number.isFinite(lon)) return Promise.resolve([lat,lon]);
-    return Promise.reject(new Error("Enter valid custom coordinates."));
-  }
-
-  return new Promise((resolve,reject)=>{
-    if(!navigator.geolocation){
-      reject(new Error("Geolocation is unavailable. Choose New York City, London, or Custom coordinates."));
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      p=>resolve([p.coords.latitude,p.coords.longitude]),
-      ()=>reject(new Error("Location unavailable. Choose New York City, London, or Custom coordinates.")),
-      {enableHighAccuracy:false,timeout:10000,maximumAge:300000}
-    );
+function getSaved(){
+  try{return JSON.parse(localStorage.getItem("mappy.saved")||"[]")}
+  catch{return []}
+}
+function setSaved(items){
+  localStorage.setItem("mappy.saved",JSON.stringify(items));
+  renderSaved();
+  renderItineraryPicker();
+}
+function isSaved(id){return getSaved().some(p=>p.id===id)}
+function toggleSaved(place){
+  const items=getSaved(), i=items.findIndex(p=>p.id===place.id);
+  if(i>=0) items.splice(i,1); else items.unshift(place);
+  setSaved(items);
+}
+function escapeHtml(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function clearMarkers(){markers.forEach(m=>map.removeLayer(m));markers=[]}
+function addMarker(coords,popup){
+  const m=L.marker(coords).addTo(map).bindPopup(popup);markers.push(m);return m
+}
+function addLocationMarker(coords){
+  const m=L.circleMarker(coords,{radius:7}).addTo(map).bindPopup("Search location");markers.push(m)
+}
+function placeForStorage(place){
+  return {id:place.id,name:place.name,lat:place.lat,lon:place.lon,distanceKm:place.distanceKm,
+    score:place.score,categories:place.categories,reasons:place.reasons,tags:place.tags,osm:place.osm}
+}
+function renderSaved(){
+  const items=getSaved();
+  savedCount.textContent=items.length;
+  if(!items.length){savedList.innerHTML="<div class='empty'>No saved places yet. Save a result to build your list.</div>";return}
+  savedList.innerHTML=items.map(p=>`
+    <div class="saved-item">
+      <div class="saved-item-main">
+        <div class="saved-item-name">${escapeHtml(p.name)}</div>
+        <div class="saved-item-meta">${escapeHtml((p.categories||[]).join(", "))}</div>
+      </div>
+      <button class="icon-btn small" data-open="${escapeHtml(p.id)}">Open</button>
+      <button class="icon-btn small" data-remove="${escapeHtml(p.id)}">×</button>
+    </div>`).join("");
+  savedList.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{
+    const p=getSaved().find(x=>x.id===b.dataset.open);if(!p)return;
+    map.setView([p.lat,p.lon],15);
+    L.popup().setLatLng([p.lat,p.lon]).setContent(`<b>${escapeHtml(p.name)}</b><br>${p.distanceKm??""} km`).openOn(map);
+  });
+  savedList.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{
+    setSaved(getSaved().filter(x=>x.id!==b.dataset.remove));
   });
 }
-
-function escapeHtml(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+function renderItineraryPicker(){
+  const items=getSaved();
+  if(!items.length){
+    itineraryPicker.innerHTML="<div class='empty'>Save at least two places to create an itinerary.</div>";
+    generateItinerary.disabled=true;return;
+  }
+  itineraryPicker.innerHTML=items.map((p,i)=>`
+    <label class="itinerary-row">
+      <input type="checkbox" value="${escapeHtml(p.id)}" checked>
+      <div class="stop-num">${i+1}</div>
+      <div><div class="stop-name">${escapeHtml(p.name)}</div><div class="stop-meta">${escapeHtml((p.categories||[]).join(", "))}</div></div>
+    </label>`).join("");
+  generateItinerary.disabled=items.length<2;
 }
-
-function clearMarkers(){
-  markers.forEach(marker=>map.removeLayer(marker));
-  markers=[];
+function distance(a,b){
+  const R=6371,p=Math.PI/180,x=(b.lat-a.lat)*p,y=(b.lon-a.lon)*p;
+  const h=Math.sin(x/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin(y/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
 }
-
-function addMarker(coords,popup){
-  const marker=L.marker(coords).addTo(map).bindPopup(popup);
-  markers.push(marker);
-  return marker;
-}
-
-function addLocationMarker(coords){
-  const marker=L.circleMarker(coords,{radius:7}).addTo(map).bindPopup("Search location");
-  markers.push(marker);
-  return marker;
-}
-
-function renderResults(data,searchLocation){
+function buildItinerary(){
+  const saved=getSaved();
+  const ids=[...itineraryPicker.querySelectorAll("input:checked")].map(x=>x.value);
+  let pool=saved.filter(p=>ids.includes(p.id));
+  if(pool.length<2){itineraryResult.innerHTML="<div class='empty'>Select at least two saved places.</div>";return}
+  let current=lastSearchLocation?{lat:lastSearchLocation[0],lon:lastSearchLocation[1]}:{lat:pool[0].lat,lon:pool[0].lon};
+  const route=[];
+  while(pool.length){
+    let best=0,bestD=Infinity;
+    pool.forEach((p,i)=>{const d=distance(current,p);if(d<bestD){bestD=d;best=i}});
+    const next=pool.splice(best,1)[0];
+    route.push({...next,travelKm:bestD});
+    current=next;
+  }
+  const total=route.reduce((s,p)=>s+(p.travelKm||0),0);
+  itineraryResult.innerHTML=`
+    <div class="status" style="margin:12px 0 5px">Suggested order · about ${total.toFixed(1)} km between stops</div>
+    <div class="timeline">${route.map((p,i)=>`
+      <div class="timeline-stop">
+        <div class="timeline-title">${i+1}. ${escapeHtml(p.name)}</div>
+        <div class="timeline-meta">${i===0?"Start here":`${p.travelKm.toFixed(1)} km from previous stop`} · ${escapeHtml((p.categories||[]).join(", "))}</div>
+      </div>`).join("")}</div>`;
   clearMarkers();
-  map.setView(searchLocation,13);
-  addLocationMarker(searchLocation);
-
+  if(lastSearchLocation)addLocationMarker(lastSearchLocation);
+  route.forEach((p,i)=>{
+    addMarker([p.lat,p.lon],`<b>${i+1}. ${escapeHtml(p.name)}</b>`);
+  });
+  if(route.length)map.fitBounds(route.map(p=>[p.lat,p.lon]),{padding:[30,30]});
+}
+function renderResults(data,searchLocation){
+  clearMarkers();map.setView(searchLocation,13);addLocationMarker(searchLocation);
   const chips=data.intent.categories.map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join("");
-  const extras=[
-    data.intent.wifi?"Wi-Fi":"",
-    data.intent.study?"study":"",
-    data.intent.work?"work":"",
-    data.intent.quiet?"quiet":"",
-    data.intent.outdoor?"outdoors":"",
-    data.intent.budget!=="any"?data.intent.budget:""
-  ].filter(Boolean).map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join("");
-
+  const extras=[data.intent.wifi?"Wi-Fi":"",data.intent.study?"study":"",data.intent.work?"work":"",
+    data.intent.quiet?"quiet":"",data.intent.outdoor?"outdoors":"",data.intent.budget!=="any"?data.intent.budget:""]
+    .filter(Boolean).map(x=>`<span class="chip">${escapeHtml(x)}</span>`).join("");
   intentEl.innerHTML=`<div class="intent"><b>Mappy understood:</b><br>${chips}${extras}</div>`;
   statusEl.textContent=`Found ${data.candidateCount} candidates, then ranked and diversified them.`;
-
   resultsEl.innerHTML=data.results.map((place,index)=>{
-    addMarker(
-      [place.lat,place.lon],
-      `<b>${escapeHtml(place.name)}</b><br>${place.distanceKm} km`
-    );
+    addMarker([place.lat,place.lon],`<b>${escapeHtml(place.name)}</b><br>${place.distanceKm} km`);
+    const saved=isSaved(place.id);
     return `<div class="card">
       <span class="score">${place.score}</span>
       <h3>${index+1}. ${escapeHtml(place.name)}</h3>
       <div class="meta">${place.distanceKm} km · ${place.categories.map(escapeHtml).join(", ")}</div>
       <div class="reason">${place.reasons.map(escapeHtml).join(" · ")}</div>
-      <div style="margin-top:7px;font-size:12px">
-        <a href="${escapeHtml(place.osm)}" target="_blank" rel="noreferrer">OpenStreetMap ↗</a>
+      <div class="actions">
+        <button class="small ${saved?"":"secondary"}" data-save="${escapeHtml(place.id)}">${saved?"♥ Saved":"♡ Save"}</button>
+        <a class="small" style="display:grid;place-items:center;border-radius:12px;background:#eef1f7" href="${escapeHtml(place.osm)}" target="_blank" rel="noreferrer">OpenStreetMap ↗</a>
       </div>
     </div>`;
-  }).join("") || "<div class='card'>No mapped places found nearby.</div>";
+  }).join("")||"<div class='card'>No mapped places found nearby.</div>";
+  resultsEl.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>{
+    const p=data.results.find(x=>x.id===b.dataset.save);if(!p)return;
+    toggleSaved(placeForStorage(p));renderResults(data,searchLocation);
+  });
 }
-
-async function runSearch(){
-  goButton.disabled=true;
-  statusEl.textContent="Understanding your request…";
-  intentEl.innerHTML="";
-  resultsEl.innerHTML="";
-
-  try{
-    const searchLocation=await getSearchLocation();
-    const userQuery=queryInput.value.trim();
-
-    if(!userQuery) throw new Error("Tell Mappy what you're looking for.");
-
-    map.setView(searchLocation,13);
-    statusEl.textContent="Finding a broad candidate set…";
-
-    const response=await fetch("/api/search",{
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({
-        query:userQuery,
-        lat:searchLocation[0],
-        lon:searchLocation[1]
-      })
-    });
-
-    let data;
-    try{ data=await response.json(); }
-    catch{ throw new Error("Mappy returned an invalid response."); }
-
-    if(!response.ok) throw new Error(data.error||"Search failed.");
-
-    renderResults(data,searchLocation);
-  }catch(error){
-    console.error("Mappy search error:",error);
-    statusEl.textContent=error?.message||"Something went wrong.";
-  }finally{
-    goButton.disabled=false;
+async function getSearchLocation(){
+  const choice=locationSelect.value;
+  if(presets[choice])return presets[choice];
+  if(choice==="custom"){
+    const lat=Number(latInput.value),lon=Number(lonInput.value);
+    if(Number.isFinite(lat)&&Number.isFinite(lon))return [lat,lon];
+    throw new Error("Enter valid custom coordinates.");
   }
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){reject(new Error("Geolocation is unavailable. Choose a preset or custom coordinates."));return}
+    navigator.geolocation.getCurrentPosition(
+      p=>resolve([p.coords.latitude,p.coords.longitude]),
+      ()=>reject(new Error("Location unavailable. Choose New York City, London, or Custom coordinates.")),
+      {enableHighAccuracy:false,timeout:10000,maximumAge:300000});
+  });
 }
-
+async function runSearch(){
+  goButton.disabled=true;statusEl.textContent="Understanding your request…";intentEl.innerHTML="";resultsEl.innerHTML="";
+  try{
+    const searchLocation=await getSearchLocation();lastSearchLocation=searchLocation;
+    const userQuery=queryInput.value.trim();if(!userQuery)throw new Error("Tell Mappy what you're looking for.");
+    map.setView(searchLocation,13);statusEl.textContent="Finding a broad candidate set…";
+    const response=await fetch("/api/search",{method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify({query:userQuery,lat:searchLocation[0],lon:searchLocation[1]})});
+    let data;try{data=await response.json()}catch{throw new Error("Mappy returned an invalid response.")}
+    if(!response.ok)throw new Error(data.error||"Search failed.");
+    renderResults(data,searchLocation);
+  }catch(error){console.error("Mappy search error:",error);statusEl.textContent=error?.message||"Something went wrong."}
+  finally{goButton.disabled=false}
+}
+locationSelect.addEventListener("change",()=>{customBox.style.display=locationSelect.value==="custom"?"grid":"none"});
 goButton.addEventListener("click",runSearch);
-queryInput.addEventListener("keydown",event=>{
-  if((event.ctrlKey||event.metaKey)&&event.key==="Enter") runSearch();
-});
-</script></body></html>
+queryInput.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")runSearch()});
+savedToggle.addEventListener("click",()=>{savedSection.style.display=savedSection.style.display==="none"?"block":"none";renderSaved()});
+itineraryToggle.addEventListener("click",()=>{itinerarySection.style.display=itinerarySection.style.display==="none"?"block":"none";renderItineraryPicker()});
+clearSaved.addEventListener("click",()=>{if(confirm("Clear all saved places?"))setSaved([])});
+generateItinerary.addEventListener("click",buildItinerary);
+renderSaved();renderItineraryPicker();
+</script>
+</body>
+</html>

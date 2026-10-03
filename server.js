@@ -121,4 +121,4 @@ app.post("/api/search",async(req,res)=>{try{
 }catch(e){console.error(e);res.status(502).json({error:"Place search failed. The public OpenStreetMap query service may be busy. Try again in a moment."})}});
 app.get("/api/health",async(_q,res)=>{let ollama=false;try{ollama=(await fetch(`${OLLAMA_URL}/api/tags`)).ok}catch{}res.json({ok:true,ollama,model:OLLAMA_MODEL})});
 app.get("*splat",(_q,res)=>res.sendFile(process.cwd()+"/public/index.html"));
-app.listen(PORT,()=>console.log(`Mappy Free v0.4: http://localhost:${PORT}`));
+app.listen(PORT,()=>console.log(`Mappy v0.5: http://localhost:${PORT}`));

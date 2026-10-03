@@ -21,6 +21,8 @@ Mappy interprets your request, finds relevant places, ranks them according to yo
 * 🌍 OpenStreetMap-powered place data
 * 🤖 Local AI support with Ollama
 * 🧩 Rule-based fallback when AI is unavailable
+* 📌 Saved locations stored locally in the browser
+* 🗺️ Itinerary builder for saved places
 * 🚫 No Google Maps API required
 * 💸 Free to run locally
 
@@ -219,13 +221,14 @@ Expect changes to the architecture, ranking system, AI pipeline, API, and user i
 Potential future features include:
 
 - [ ] Personalized ranking
-* [ ] Saved places
+* [x] Saved places
 * [ ] Search history
 * [ ] Place comparison
 * [ ] Advanced preference profiles
 * [ ] Mood and vibe search
 * [ ] Crowd avoidance
 * [ ] Multi-stop trip planning
+* [x] Saved-place itinerary builder
 * [ ] AI-generated itineraries
 * [ ] Better place explanations
 * [ ] Improved geographic search
@@ -257,3 +260,8 @@ We build, test, and open-source experiments across AI, intelligent systems, APIs
 **Linked AI**
 
 *Exploring what AI can do.*
+
+
+## 🆕 v0.5
+
+Mappy now includes browser-local saved places and an itinerary builder. Save results, choose saved places, and generate a suggested stop order based on geographic proximity. No account or database is required for this first version.
